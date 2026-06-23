@@ -1,58 +1,59 @@
 name: Build Android APK
-on: [push]
+
+on:
+  workflow_dispatch:
+  push:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Descomprimir y Limpiar Proyecto
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Descomprimir proyecto y asegurar raíz
         run: |
-          unzip AlexanderPerfiles.zip
+          unzip -o AlexanderPerfiles.zip
+
           if [ ! -f "package.json" ]; then
-            echo "package.json no está en la raíz. Buscando en subcarpetas..."
             SUBDIR=$(find . -maxdepth 2 -name "package.json" -exec dirname {} \; | grep -v "^.$" | head -n 1)
+
             if [ -n "$SUBDIR" ]; then
-              echo "Proyecto encontrado en: $SUBDIR. Acomodando archivos..."
-              mv "$SUBDIR"/* . 2>/dev/null || true
-              mv "$SUBDIR"/.* . 2>/dev/null || true
+              cp -r "$SUBDIR"/* . 2>/dev/null || true
+              cp -r "$SUBDIR"/.* . 2>/dev/null || true
             fi
           fi
-          echo "Borrando node_modules viejos del celular..."
+
           rm -rf node_modules package-lock.json
 
-      - name: Configurar JDK 17
+      - name: Configurar Java
         uses: actions/setup-java@v4
         with:
+          distribution: zulu
           java-version: '17'
-          distribution: 'zulu'
 
-      - name: Configurar Node.js
+      - name: Configurar Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Instalar Dependencias desde Cero
+      - name: Instalar dependencias
         run: npm install --legacy-peer-deps
 
       - name: Sincronizar Capacitor
         run: npx cap sync
 
-      - name: Configurar Entorno de Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: wrapper
-          build-root-directory: android
+      - name: Dar permisos a Gradle
+        run: chmod +x android/gradlew
 
-      - name: Compilar APK Final
+      - name: Construir APK
         run: |
           cd android
-          chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
-          
-      - name: Subir APK Final
+
+      - name: Subir APK
         uses: actions/upload-artifact@v4
         with:
-          name: Alexander-Perfiles-APK
+          name: AlexanderPerfiles-APK
           path: android/app/build/outputs/apk/debug/*.apk
