@@ -19,7 +19,6 @@ jobs:
               mv "$SUBDIR"/.* . 2>/dev/null || true
             fi
           fi
-          # BORRAR LA CARPETA DEL CELULAR PARA EVITAR CONFLICTOS DE RUTA
           echo "Borrando node_modules viejos del celular..."
           rm -rf node_modules package-lock.json
 
@@ -32,7 +31,7 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
 
       - name: Instalar Dependencias desde Cero
         run: npm install --legacy-peer-deps
@@ -57,4 +56,3 @@ jobs:
         with:
           name: Alexander-Perfiles-APK
           path: android/app/build/outputs/apk/debug/*.apk
-          
