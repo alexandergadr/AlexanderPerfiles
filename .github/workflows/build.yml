@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: zulu
-          java-version: '17'
+          java-version: '21' # <-- ACTUALIZADO A JAVA 21 PARA SOLUCIONAR EL ERROR
 
       - name: Configurar Node
         uses: actions/setup-node@v4
