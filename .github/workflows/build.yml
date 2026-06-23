@@ -9,12 +9,10 @@ jobs:
 
       - name: Descomprimir Proyecto
         run: |
-          sudo apt-get install unzip -y
           unzip AlexanderPerfiles.zip -d extracted
-          PKG_PATH=$(find extracted -name package.json)
-          PKG_DIR=$(dirname "$PKG_PATH")
-          cp -r "$PKG_DIR"/* .
-          cp -r "$PKG_DIR"/.* . 2>/dev/null || true
+          TARGET_DIR=$(find extracted -name package.json -exec dirname {} \; | head -n 1)
+          echo "Proyecto encontrado en: $TARGET_DIR"
+          cp -r "$TARGET_DIR"/. .
 
       - name: Configurar JDK 17
         uses: actions/setup-java@v4
